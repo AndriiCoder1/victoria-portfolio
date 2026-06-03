@@ -23,6 +23,8 @@
             min-height: 100vh;
             overflow-x: hidden;
             background: #e8ddd0;
+            margin: 0;
+        
         }
 
         /* Фон с плавной сменой картинок */
@@ -38,6 +40,8 @@
             transition: opacity 1.5s ease-in-out;
             z-index: 0;
             pointer-events: none;
+            object-fit: cover;
+        
         }
         
         /* Фоновые изображения */
@@ -177,7 +181,7 @@
         
         /* Карточка работы */
         .art-card {
-            background: rgba(255, 250, 240, 0.15);  /* Светлый фон */
+            background: rgba(255, 250, 240, 0.15);  
             backdrop-filter: blur(8px);
             border-radius: 24px;
             overflow: hidden;
@@ -266,8 +270,6 @@
 
         /* Анимация появления секций при скролле */
         section {
-            opacity: 0;
-            transform: translateY(35px);
             transition: all 0.8s cubic-bezier(0.2, 0.8, 0.3, 1);
         }
         section.visible {
@@ -370,13 +372,27 @@
 </div>
 
 <script>
-    // Плавная смена фоновых картин (художественный эффект)
+    // Плавная смена фоновых картин
     let bgIndex = 1;
     const bgElements = {
         1: document.getElementById('bg1'),
         2: document.getElementById('bg2'),
         3: document.getElementById('bg3')
     };
+    
+    // Устанавливаем первый фон видимым сразу
+    if (bgElements[1]) {
+        bgElements[1].style.opacity = '1';
+        bgElements[1].style.transition = 'opacity 1.5s ease-in-out';
+    }
+    if (bgElements[2]) {
+        bgElements[2].style.opacity = '0';
+        bgElements[2].style.transition = 'opacity 1.5s ease-in-out';
+    }
+    if (bgElements[3]) {
+        bgElements[3].style.opacity = '0';
+        bgElements[3].style.transition = 'opacity 1.5s ease-in-out';
+    }
     
     setInterval(() => {
         let next = bgIndex % 3 + 1;
@@ -385,7 +401,7 @@
         bgIndex = next;
     }, 7000);
     
-    // Функция для генерации 34 карточек работ с художественными названиями
+    // Названия работ
     const artTitles = [
         "Whispers of Dawn", "Melancholy in Blue", "Golden Hour", "Silent Reverie",
         "Dancing Shadows", "Crimson Petals", "Ethereal Path", "Midnight Lullaby",
@@ -412,7 +428,7 @@
     
     const container = document.getElementById('artworksGrid');
     
-    // Генерируем 34 карточки с работами
+    // Генерируем карточки
     for (let i = 1; i <= 34; i++) {
         const title = artTitles[(i - 1) % artTitles.length];
         const medium = mediums[(i - 1) % mediums.length];
@@ -420,23 +436,28 @@
         
         const artCard = document.createElement('div');
         artCard.className = 'art-card';
+        artCard.style.opacity = '1';
+        artCard.style.visibility = 'visible';
         
         const img = document.createElement('img');
         img.className = 'art-image';
-        img.src = `images/work_${i}.jpg`; 
+        img.src = `images/work_${i}.jpg`;
         img.alt = title;
         img.loading = 'lazy';
-
-        // делаем изображение видимым после загрузки
+        img.style.opacity = '1';
+        img.style.visibility = 'visible';
+        img.style.display = 'block';
+        
+        // Обработка ошибок загрузки
+        img.onerror = function() {
+            console.warn(`Image not found: ${this.src}`);
+            this.style.background = '#f0e6e0';
+            this.style.minHeight = '200px';
+        };
+        
         img.onload = function() {
             this.style.opacity = '1';
             this.style.visibility = 'visible';
-        };
-        
-        img.onerror = function() {
-            // Если файла нет — показываем заглушку
-            this.src = 'data:image/svg+xml,...'; 
-            this.style.opacity = '1';
         };
         
         const infoDiv = document.createElement('div');
@@ -468,23 +489,31 @@
         container.appendChild(artCard);
     }
     
-    // Intersection Observer для анимации появления блоков при скролле (парящий эффект)
+    // Все секции видимы сразу
+    document.querySelectorAll('section').forEach((sec, index) => {
+        // Небольшая задержка для каждой секции
+        setTimeout(() => {
+            sec.style.opacity = '1';
+            sec.style.transform = 'translateY(0)';
+            sec.style.transition = 'all 0.8s cubic-bezier(0.2, 0.8, 0.3, 1)';
+        }, 100 * (index + 1));
+    });
+    
+    // Intersection Observer для повторной анимации при скролле
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
             }
         });
-    }, { threshold: 0.2, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
     
     document.querySelectorAll('section').forEach(sec => {
         observer.observe(sec);
     });
     
-    // Небольшой фикс для фона — чтобы при первом рендере картинки отображались корректно
-    setTimeout(() => {
-        if(bgElements[1]) bgElements[1].style.opacity = '1';
-    }, 100);
+    console.log('Page fully loaded. Sections should be visible.');
 </script>
 
 </body>
