@@ -44,11 +44,6 @@
         
         }
         
-        /* Фоновые изображения */
-        .art-bg-1 { background-image: url('images/work_1.jpg'); }
-        .art-bg-2 { background-image: url('images/work_2.jpg'); opacity: 0; }
-        .art-bg-3 { background-image: url('images/work_3.jpg'); opacity: 0; }
-        
         /* Легкая затемняющая подложка для читаемости текста */
         .overlay {
             position: fixed;
@@ -181,7 +176,7 @@
         
         /* Карточка работы */
         .art-card {
-            background: rgba(255, 250, 240, 0.15);  
+            background: rgba(255, 250, 240, 0.15);  /* Светлый фон */
             backdrop-filter: blur(8px);
             border-radius: 24px;
             overflow: hidden;
@@ -313,9 +308,9 @@
 <body>
 
 <!-- Фоновые слои с автоматической сменой картин (имитация живого фона) -->
-<div class="art-bg art-bg-1" id="bg1"></div>
-<div class="art-bg art-bg-2" id="bg2"></div>
-<div class="art-bg art-bg-3" id="bg3"></div>
+<div class="art-bg" id="bg1"></div>
+<div class="art-bg" id="bg2"></div>
+<div class="art-bg" id="bg3"></div>
 <div class="overlay"></div>
 
 <div class="content">
@@ -372,134 +367,168 @@
 </div>
 
 <script>
-    // Плавная смена фоновых картин
-    let bgIndex = 1;
-    const bgElements = {
-        1: document.getElementById('bg1'),
-        2: document.getElementById('bg2'),
-        3: document.getElementById('bg3')
-    };
-    
-    // Устанавливаем первый фон видимым сразу
-    if (bgElements[1]) {
-        bgElements[1].style.opacity = '1';
-        bgElements[1].style.transition = 'opacity 1.5s ease-in-out';
+    // Данные всех работ 
+    const artworks = [
+        { file: 'work_1.jpg',  w: 996,  h: 1135, title: 'Farbstiftzeichnung auf Papier',              medium: 'Colored Pencil on Paper',   year: '2021-2026', desc: 'Exploration of inner landscapes' },
+        { file: 'work_2.jpg',  w: 799,  h: 670,  title: 'Öl auf Leinwand',                            medium: 'Oil on Canvas',             year: '2017-2025', desc: 'Series inspired by Nordic light' },
+        { file: 'work_3.jpg',  w: 1126, h: 1280, title: 'Farbstiftzeichnung auf Papier',              medium: 'Colored Pencil on Paper',   year: '2021-2026', desc: "Part of 'Emotional Cartography'" },
+        { file: 'work_4.jpg',  w: 1280, h: 960,  title: 'Farbstiftzeichnung auf Papier',              medium: 'Colored Pencil on Paper',   year: '2021-2026', desc: "From the 'Memory Layers' cycle" },
+        { file: 'work_5.jpg',  w: 1280, h: 1280, title: 'Digitale Illustration (Procreate)',           medium: 'Digital Art (Procreate)',   year: '2025',      desc: 'Meditation on form and color' },
+        { file: 'work_6.jpg',  w: 960,  h: 1280, title: 'Farbstiftzeichnung auf Papier',              medium: 'Colored Pencil on Paper',   year: '2021-2026', desc: 'Contemporary expressionism' },
+        { file: 'work_7.jpg',  w: 1120, h: 1280, title: 'Farbstiftzeichnung auf Papier',              medium: 'Colored Pencil on Paper',   year: '2021-2026', desc: 'Study in contrasts' },
+        { file: 'work_8.jpg',  w: 1280, h: 1280, title: 'Digitale Illustration (Procreate)',           medium: 'Digital Art (Procreate)',   year: '2023',      desc: 'Private collection highlight' },
+        { file: 'work_9.jpg',  w: 1280, h: 1048, title: 'Öl auf Leinwand',                            medium: 'Oil on Canvas',             year: '2017-2025', desc: 'Exploration of inner landscapes' },
+        { file: 'work_10.jpg', w: 961,  h: 1280, title: 'Farbstiftzeichnung auf Papier',              medium: 'Colored Pencil on Paper',   year: '2021-2026', desc: 'Series inspired by Nordic light' },
+        { file: 'work_11.jpg', w: 1280, h: 1280, title: 'Digitale Illustration (Procreate)',           medium: 'Digital Art (Procreate)',   year: '2022',      desc: "Part of 'Emotional Cartography'" },
+        { file: 'work_12.jpg', w: 960,  h: 1280, title: 'Öl auf Leinwand',                            medium: 'Oil on Canvas',             year: '2017-2025', desc: "From the 'Memory Layers' cycle" },
+        { file: 'work_13.jpg', w: 1280, h: 959,  title: 'Farbstiftzeichnung auf Papier',              medium: 'Colored Pencil on Paper',   year: '2021-2026', desc: 'Meditation on form and color' },
+        { file: 'work_14.jpg', w: 1024, h: 1280, title: 'Digitale Illustration (Procreate)',           medium: 'Digital Art (Procreate)',   year: '2022',      desc: 'Contemporary expressionism' },
+        { file: 'work_15.jpg', w: 1280, h: 957,  title: 'Öl auf Leinwand',                            medium: 'Oil on Canvas',             year: '2017-2025', desc: 'Study in contrasts' },
+        { file: 'work_16.jpg', w: 1280, h: 960,  title: 'Digitale Illustration (Procreate)',           medium: 'Digital Art (Procreate)',   year: '2024',      desc: 'Private collection highlight' },
+        { file: 'work_17.jpg', w: 959,  h: 1280, title: 'Farbstiftzeichnung auf Papier',              medium: 'Colored Pencil on Paper',   year: '2021-2026', desc: 'Exploration of inner landscapes' },
+        { file: 'work_18.jpg', w: 864,  h: 702,  title: 'Digitale Illustration (Procreate)',           medium: 'Digital Art (Procreate)',   year: '2019',      desc: 'Series inspired by Nordic light' },
+        { file: 'work_19.jpg', w: 944,  h: 1280, title: 'Незламна Киця, Буча 2022',                   medium: 'Digital Art (Procreate)',   year: '2022',      desc: 'Unzerbrechliche Katze, Butscha 2022' },
+        { file: 'work_20.jpg', w: 1280, h: 1280, title: 'Digitale Illustration (Procreate)',           medium: 'Digital Art (Procreate)',   year: '2023',      desc: "Part of 'Emotional Cartography'" },
+        { file: 'work_21.jpg', w: 1057, h: 1280, title: 'Digitale Illustration (Procreate)',           medium: 'Digital Art (Procreate)',   year: '2020',      desc: "From the 'Memory Layers' cycle" },
+        { file: 'work_22.jpg', w: 969,  h: 1280, title: 'Acryl auf Leinwand',                         medium: 'Acrylic on Canvas',         year: '2020-2025', desc: 'Meditation on form and color' },
+        { file: 'work_23.jpg', w: 960,  h: 1280, title: 'Acryl auf Leinwand',                         medium: 'Acrylic on Canvas',         year: '2020-2025', desc: 'Contemporary expressionism' },
+        { file: 'work_24.jpg', w: 355,  h: 369,  title: 'Acryl auf Leinwand',                         medium: 'Acrylic on Canvas',         year: '2020-2025', desc: 'Study in contrasts' },
+        { file: 'work_25.jpg', w: 463,  h: 448,  title: 'Acryl auf Leinwand',                         medium: 'Acrylic on Canvas',         year: '2020-2025', desc: 'Private collection highlight' },
+        { file: 'work_26.jpg', w: 1280, h: 308,  title: 'Bemalung Aussenwand Kindergarten',            medium: 'Weatherproof Paint',        year: '2018',      desc: 'Outdoor mural, Kindergarten' },
+        { file: 'work_27.jpg', w: 1024, h: 1280, title: 'Malerei auf Stoff',                          medium: 'Painting on Fabric',        year: '2020',      desc: 'Exploration of inner landscapes' },
+        { file: 'work_28.jpg', w: 1130, h: 1280, title: 'Öl auf Leinwand',                            medium: 'Oil on Canvas',             year: '2017-2025', desc: 'Series inspired by Nordic light' },
+        { file: 'work_29.jpg', w: 1118, h: 1280, title: 'Farbstiftzeichnung auf Papier',              medium: 'Colored Pencil on Paper',   year: '2021-2026', desc: "Part of 'Emotional Cartography'" },
+        { file: 'work_30.jpg', w: 807,  h: 720,  title: 'Malerei auf Stoff',                          medium: 'Painting on Fabric',        year: '2019',      desc: "From the 'Memory Layers' cycle" },
+        { file: 'work_31.jpg', w: 960,  h: 1280, title: 'Malerei auf Stoff',                          medium: 'Painting on Fabric',        year: '2024',      desc: 'Meditation on form and color' },
+        { file: 'work_32.jpg', w: 1280, h: 889,  title: 'Farbstiftzeichnung auf Papier',              medium: 'Colored Pencil on Paper',   year: '2021-2026', desc: 'Contemporary expressionism' },
+        { file: 'work_33.jpg', w: 1280, h: 960,  title: 'Malerei auf Stoff',                          medium: 'Painting on Fabric',        year: '2016',      desc: 'Study in contrasts' },
+        { file: 'work_34.jpg', w: 1280, h: 870,  title: 'Öl auf Leinwand',                            medium: 'Oil on Canvas',             year: '2017-2025', desc: 'Private collection highlight' }
+    ];
+
+    // Фон — смена всех картин
+    let bgIndex = 0;
+    const bgLayers = [
+        document.getElementById('bg1'),
+        document.getElementById('bg2'),
+        document.getElementById('bg3')
+    ];
+
+    function isVertical(w, h) {
+        return h > w;
     }
-    if (bgElements[2]) {
-        bgElements[2].style.opacity = '0';
-        bgElements[2].style.transition = 'opacity 1.5s ease-in-out';
+
+    function setBgLayer(layer, artwork) {
+        layer.style.backgroundImage = `url('images/${artwork.file}')`;
+        layer.style.backgroundColor = '#b8afa5';
+        
+        if (artwork.w < 500 || artwork.h < 500) {
+            // Маленькие картинки — не растягиваем
+            layer.style.backgroundSize = 'auto';
+        } else if (isVertical(artwork.w, artwork.h)) {
+            layer.style.backgroundSize = 'contain';
+        } else {
+            layer.style.backgroundSize = 'cover';
+        }
+        layer.style.backgroundPosition = 'center';
+        layer.style.backgroundRepeat = 'no-repeat';
     }
-    if (bgElements[3]) {
-        bgElements[3].style.opacity = '0';
-        bgElements[3].style.transition = 'opacity 1.5s ease-in-out';
-    }
-    
+
+    // Инициализация
+    bgLayers.forEach((layer, i) => {
+        layer.style.transition = 'opacity 1.5s ease-in-out';
+        if (i === 0) {
+            layer.style.opacity = '1';
+            setBgLayer(layer, artworks[0]);
+        } else {
+            layer.style.opacity = '0';
+        }
+    });
+
+    // Смена фона
     setInterval(() => {
-        let next = bgIndex % 3 + 1;
-        bgElements[bgIndex].style.opacity = '0';
-        bgElements[next].style.opacity = '1';
-        bgIndex = next;
+        bgIndex = (bgIndex + 1) % artworks.length;
+        
+        // Находим неактивный слой
+        let targetLayer;
+        for (let layer of bgLayers) {
+            if (layer.style.opacity === '0' || layer.style.opacity === '') {
+                targetLayer = layer;
+                break;
+            }
+        }
+        
+        if (targetLayer) {
+            setBgLayer(targetLayer, artworks[bgIndex]);
+            targetLayer.style.opacity = '1';
+            
+            // Прячем предыдущий
+            for (let layer of bgLayers) {
+                if (layer !== targetLayer) {
+                    layer.style.opacity = '0';
+                }
+            }
+        }
     }, 7000);
+
     
-    // Названия работ
-    const artTitles = [
-        "Whispers of Dawn", "Melancholy in Blue", "Golden Hour", "Silent Reverie",
-        "Dancing Shadows", "Crimson Petals", "Ethereal Path", "Midnight Lullaby",
-        "Azure Dreams", "Fragments of Light", "Velvet Night", "Summer's Echo",
-        "Forgotten Garden", "Horizon Lines", "Solitude", "Awakening",
-        "Where Oceans Meet", "The Quiet World", "Luminous", "Twilight Reverence",
-        "Ephemeral Spring", "Canvas of Stars", "Infinite Depths", "Morning Hymn",
-        "Scarlet Mood", "A Moment's Pause", "Celestial Dance", "Violet Skies",
-        "Rustling Leaves", "Portrait of Silence", "Soft Geometry", "Warm Embrace",
-        "Midnight Garden", "Silent Song"
-    ];
-    
-    const mediums = [
-        "Oil on Canvas", "Acrylic & Mixed Media", "Watercolor", "Pastel",
-        "Digital Art", "Ink Drawing", "Gouache", "Charcoal"
-    ];
-    
-    const descriptions = [
-        "Exploration of inner landscapes", "Series inspired by Nordic light",
-        "Part of 'Emotional Cartography'", "From the 'Memory Layers' cycle",
-        "Meditation on form and color", "Contemporary expressionism",
-        "Study in contrasts", "Private collection highlight"
-    ];
-    
+    // Создание карточек
     const container = document.getElementById('artworksGrid');
-    
-    // Генерируем карточки
-    for (let i = 1; i <= 34; i++) {
-        const title = artTitles[(i - 1) % artTitles.length];
-        const medium = mediums[(i - 1) % mediums.length];
-        const desc = descriptions[(i - 1) % descriptions.length];
-        
-        const artCard = document.createElement('div');
-        artCard.className = 'art-card';
-        artCard.style.opacity = '1';
-        artCard.style.visibility = 'visible';
-        
-        const img = document.createElement('img');
-        img.className = 'art-image';
-        img.src = `images/work_${i}.jpg`;
-        img.alt = title;
-        img.loading = 'lazy';
-        img.style.opacity = '1';
-        img.style.visibility = 'visible';
-        img.style.display = 'block';
-        
-        // Обработка ошибок загрузки
-        img.onerror = function() {
-            console.warn(`Image not found: ${this.src}`);
-            this.style.background = '#f0e6e0';
-            this.style.minHeight = '200px';
-        };
-        
-        img.onload = function() {
-            this.style.opacity = '1';
-            this.style.visibility = 'visible';
-        };
-        
-        const infoDiv = document.createElement('div');
-        infoDiv.className = 'art-info';
-        
-        const titleSpan = document.createElement('div');
-        titleSpan.className = 'art-title';
-        titleSpan.textContent = title;
-        
-        const mediumSpan = document.createElement('div');
-        mediumSpan.className = 'art-medium';
-        mediumSpan.textContent = medium;
-        
-        const descSpan = document.createElement('div');
-        descSpan.className = 'art-desc';
-        descSpan.textContent = desc;
-        
-        infoDiv.appendChild(titleSpan);
-        infoDiv.appendChild(mediumSpan);
-        infoDiv.appendChild(descSpan);
-        
-        artCard.appendChild(img);
-        artCard.appendChild(infoDiv);
-        
-        artCard.addEventListener('click', () => {
-            window.open(img.src, '_blank');
+    if (!container) {
+        console.error('Container #artworksGrid not found!');
+    } else {
+        artworks.forEach((art, index) => {
+            const artCard = document.createElement('div');
+            artCard.className = 'art-card';
+            
+            const img = document.createElement('img');
+            img.className = 'art-image';
+            img.src = `images/${art.file}`;
+            img.alt = art.title;
+            img.loading = 'lazy';
+            
+            img.onload = () => console.log(`✅ Loaded: ${art.file}`);
+            img.onerror = () => console.warn(`❌ Missing: ${art.file}`);
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'art-info';
+            
+            const titleSpan = document.createElement('div');
+            titleSpan.className = 'art-title';
+            titleSpan.textContent = art.title;
+            
+            const mediumSpan = document.createElement('div');
+            mediumSpan.className = 'art-medium';
+            mediumSpan.textContent = `${art.medium}, ${art.year}`;
+            
+            const descSpan = document.createElement('div');
+            descSpan.className = 'art-desc';
+            descSpan.textContent = art.desc;
+            
+            infoDiv.appendChild(titleSpan);
+            infoDiv.appendChild(mediumSpan);
+            infoDiv.appendChild(descSpan);
+            
+            artCard.appendChild(img);
+            artCard.appendChild(infoDiv);
+            
+            artCard.addEventListener('click', () => {
+                window.open(img.src, '_blank');
+            });
+            
+            container.appendChild(artCard);
         });
         
-        container.appendChild(artCard);
+        console.log(`✅ Created ${container.children.length} art cards`);
     }
     
-    // Все секции видимы сразу
+    // Анимация секций
     document.querySelectorAll('section').forEach((sec, index) => {
-        // Небольшая задержка для каждой секции
-        setTimeout(() => {
-            sec.style.opacity = '1';
-            sec.style.transform = 'translateY(0)';
-            sec.style.transition = 'all 0.8s cubic-bezier(0.2, 0.8, 0.3, 1)';
-        }, 100 * (index + 1));
+        sec.style.opacity = '1';
+        sec.style.transform = 'translateY(0)';
+        sec.classList.add('visible');
+        console.log(`Section ${index + 1} made visible`);
     });
-    
-    // Intersection Observer для повторной анимации при скролле
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -507,13 +536,11 @@
                 entry.target.style.transform = 'translateY(0)';
             }
         });
-    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-    
-    document.querySelectorAll('section').forEach(sec => {
-        observer.observe(sec);
-    });
-    
-    console.log('Page fully loaded. Sections should be visible.');
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('section').forEach(sec => observer.observe(sec));
+
+    console.log('✅ All done!');
 </script>
 
 </body>
