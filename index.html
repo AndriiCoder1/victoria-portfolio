@@ -175,43 +175,49 @@
             gap: 1.8rem;
         }
         
+        /* Карточка работы */
         .art-card {
-            background: rgba(45, 42, 46, 0.85);  /* Тёмный фон */
+            background: rgba(255, 250, 240, 0.15);  /* Светлый фон */
             backdrop-filter: blur(8px);
             border-radius: 24px;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             cursor: pointer;
             border: 1px solid rgba(212, 165, 165, 0.5);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
         
         .art-card:hover {
             transform: translateY(-8px) scale(1.01);
-            background: rgba(60, 55, 65, 0.9);
-            box-shadow: 0 20px 35px rgba(0,0,0,0.4);
+            background: rgba(255, 250, 240, 0.25);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.15);
             border-color: rgba(212, 165, 165, 0.8);
         }
         
+        /* Изображение в карточке */
         .art-image {
             width: 100%;
             aspect-ratio: 1 / 1;
             object-fit: cover;
             display: block;
             transition: transform 0.5s ease;
+            opacity: 1 !important;  /* видимость */
+            visibility: visible !important;
         }
         
         .art-card:hover .art-image {
             transform: scale(1.02);
         }
         
+        /* Информация под изображением */
         .art-info {
-            background: rgba(255, 250, 240, 0.95);  /* Светлый фон для читаемости */
+            background: rgba(255, 250, 240, 0.85);
+            backdrop-filter: blur(8px);
             padding: 1rem 1.2rem 1.3rem;
             margin: 12px;
             border-radius: 16px;
         }
-        
+                
         .art-title {
             font-size: 1.1rem;
             font-weight: 600;
@@ -419,6 +425,19 @@
         img.className = 'art-image';
         img.src = `images/work_${i}.jpg`; 
         img.alt = title;
+        img.loading = 'lazy';
+
+        // делаем изображение видимым после загрузки
+        img.onload = function() {
+            this.style.opacity = '1';
+            this.style.visibility = 'visible';
+        };
+        
+        img.onerror = function() {
+            // Если файла нет — показываем заглушку
+            this.src = 'data:image/svg+xml,...'; 
+            this.style.opacity = '1';
+        };
         
         const infoDiv = document.createElement('div');
         infoDiv.className = 'art-info';
